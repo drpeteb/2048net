@@ -1,4 +1,3 @@
-import time
 import numpy as np
 from enum import Enum
 
@@ -32,7 +31,9 @@ class Board:
             print(" ".join(["{0: >5}".format(2 ** entry) if (entry > 0) else "    ." for entry in self._grid[ii, :]]))
         print("-------")
         print("Current score: {}".format(self.score()))
-        time.sleep(0.1)
+
+    def state(self):
+        return self._grid.flatten()
 
     def score(self):
         return np.sum((2 ** self._grid) * (self._grid > 0))

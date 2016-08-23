@@ -1,4 +1,5 @@
-from game import Game
+from game import Game, HumanPlayer
 
-g = Game()
+p = HumanPlayer()
+g = Game(p)
 g.play()
