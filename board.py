@@ -36,7 +36,7 @@ class Board:
         return self._grid.flatten()
 
     def score(self):
-        return np.sum((2 ** self._grid) * (self._grid > 0))
+        return np.sum((2 ** self._grid) * self._grid)
 
     def is_game_over(self):
         return (np.sum(self._grid == 0) == 0)
