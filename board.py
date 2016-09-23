@@ -1,11 +1,11 @@
 import numpy as np
-from enum import Enum
+from enum import IntEnum
 
 # Global variables
 GRID_SIZE = 4
 PROB2 = 0.9
 
-class Direction(Enum):
+class Direction(IntEnum):
     up = 0
     down = 1
     left = 2

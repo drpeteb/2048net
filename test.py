@@ -1,10 +1,7 @@
-import numpy as np
 from game import Game, HumanPlayer, DumbComputerPlayer
-from robot import AIPlayer
 
 #p = HumanPlayer()
-#p = DumbComputerPlayer(slow=True)
-p = AIPlayer(slow=False)
+p = DumbComputerPlayer(slow=True)
 
 g = Game(p, display=True)
 g.play()
