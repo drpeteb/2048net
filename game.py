@@ -71,6 +71,8 @@ class Game:
 
             # Get a move from the player and do it
             move = self._player.get_move(self._board.state(), self._board.score(), available)
+            if move not in available:
+                raise RuntimeError("Illegal move. You lose, cheater!")
             self._board.move(move)
 
         if self._display:

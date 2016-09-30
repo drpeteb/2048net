@@ -1,7 +1,7 @@
 from game import Game, HumanPlayer, DumbComputerPlayer
 
-#p = HumanPlayer()
-p = DumbComputerPlayer(slow=True)
+p = HumanPlayer()
+#p = DumbComputerPlayer(slow=True)
 
 g = Game(p, display=True)
 g.play()

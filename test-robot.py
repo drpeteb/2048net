@@ -1,17 +1,20 @@
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 from game import Game
 from robot import AIPlayer
 
-NUM_IT = 200
-NUM_IN_BATCH = 10
+NUM_IT = 1024
+NUM_IN_BATCH = 16
 
 netty = AIPlayer(slow=False)
 scores = []
 batch_averages = []
+best_game = None
+best_score = 0
+start_time = time.time()
 
 for nn in range(NUM_IT):
-    print(nn)
     this_batch = []
     for bb in range(NUM_IN_BATCH):
         g = Game(netty, display=False)
@@ -19,7 +22,12 @@ for nn in range(NUM_IT):
         scores.append(final_score)
         this_batch.append(final_score)
         netty.game_over(final_score)
-    batch_averages.append(np.mean(np.array(this_batch)))
+        if final_score > best_score:
+            best_score = final_score
+            best_game = g
+    ba = np.mean(np.array(this_batch))
+    batch_averages.append(ba)
+    print("It {:5d}: average score = {:6.1f}, time since started = {:6.1f}s".format(nn+1, ba, time.time()-start_time))
     netty.training_iteration()
 
 fig = plt.figure()
@@ -29,9 +37,5 @@ ax = fig.add_subplot(2,1,2)
 ax.plot(np.array(batch_averages), 'k')
 plt.show()
 
-g._board.display()
-
-#import time
-#start_time = time.time()
-#end_time = time.time()
-#print(end_time - start_time)
+print("Best results:")
+best_game._board.display()

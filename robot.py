@@ -4,31 +4,32 @@ import tensorflow as tf
 from board import Direction
 from game import IPlayer
 
-HIDDEN_NODES = 36
-LEARNING_RATE = 0.01
+EPS = 0.0001
 DISCOUNT = 0.9
+HIDDEN_NODES = 32
+LEARNING_RATE = 0.01
 
 def create_network(sess):
-    #W = tf.Variable(tf.zeros([16,4]))
-    #b = tf.Variable(0.1 * tf.ones([4]))
-    #action_prob = tf.nn.softmax(tf.matmul(state,W) + b)
-
     state = tf.placeholder(tf.float32, shape=[None, 16])
     reward_action = tf.placeholder(tf.float32, shape=[None, 4])
 
     W1 = tf.Variable(tf.truncated_normal([16, HIDDEN_NODES], stddev=0.1))
     b1 = tf.Variable(tf.constant(0.1, shape=[HIDDEN_NODES]))
-    nl1 = tf.nn.relu(tf.matmul(state, W1) + b1)
+    nl1 = tf.nn.elu(tf.matmul(state, W1) + b1)
 
     W2 = tf.Variable(tf.truncated_normal([HIDDEN_NODES, 4], stddev=0.1))
     b2 = tf.Variable(tf.constant(0.1, shape=[4]))
-    action_prob = tf.nn.softmax(tf.matmul(nl1, W2) + b2)
+
+    confident_action_prob = tf.nn.softmax(tf.matmul(nl1, W2) + b2)
+    action_prob = EPS * tf.constant(0.25, shape=[4]) + (1 - EPS) * confident_action_prob
+
+    params = (W1, b1, W2, b2)
 
     loss = tf.reduce_mean(-tf.reduce_sum(reward_action * tf.log(action_prob), reduction_indices=[1]))
     train_step = tf.train.AdamOptimizer(LEARNING_RATE).minimize(loss)
 
     sess.run(tf.initialize_all_variables())
-    return state, reward_action, action_prob, train_step
+    return state, reward_action, action_prob, train_step, params
 
 
 
@@ -47,7 +48,7 @@ class AIPlayer(IPlayer):
 
         self.sess = tf.InteractiveSession()
         print("Constructing Net")
-        self.state, self.reward_action, self.action_prob, self.train_step = create_network(self.sess)
+        self.state, self.reward_action, self.action_prob, self.train_step, self.params = create_network(self.sess)
 
 
     def get_move(self, state, score, available):
@@ -99,8 +100,8 @@ class AIPlayer(IPlayer):
         reward_action = reward[:,np.newaxis] * action
 
         self.sess.run(self.train_step, feed_dict={
-                self.state: state,
-                self.reward_action: reward_action,
+            self.state: state,
+            self.reward_action: reward_action,
         })
 
         self._state_buffer = []
